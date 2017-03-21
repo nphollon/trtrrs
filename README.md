@@ -1,3 +1,3 @@
-# trtrrs
+# Trtrrs
 
-My first Unity project. This repo is just the C-Sharp code. Click [here](http://nickhollon.com/trtrrs.exe) to download the game.
+My first Unity project. Click [here](http://nickhollon.com/Trtrrs.zip) to download the game. It is only available for Windows at the moment.
