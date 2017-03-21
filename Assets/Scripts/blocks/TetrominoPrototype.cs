@@ -32,6 +32,6 @@ public class TetrominoPrototype {
 	}
 
 	public Point PivotOffset() {
-		return isLineOrSquare ? new Point (0, 1) : new Point (0, 0);
+		return isLineOrSquare ? Point.Above : Point.Zero;
 	}
 }

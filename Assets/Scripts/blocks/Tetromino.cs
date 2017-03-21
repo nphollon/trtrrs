@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Tetromino {
-	private static readonly Tetromino empty = new Tetromino (new List<Block> (), new List<Point> (), new Point (0, 0), new Point (0, 0));
+	private static readonly Tetromino empty = new Tetromino (new List<Block> (), new List<Point> (), Point.Zero, Point.Zero);
 
 	private List<Block> blocks;
 	private Point origin;

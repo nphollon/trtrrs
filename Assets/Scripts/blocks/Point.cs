@@ -2,7 +2,13 @@
 using UnityEngine;
 
 [Serializable]
-public struct Point {
+public class Point {
+	public static readonly Point ToTheLeft = new Point (-1, 0);
+	public static readonly Point ToTheRight = new Point (1, 0);
+	public static readonly Point Below = new Point (0, -1);
+	public static readonly Point Above = new Point (0, 1);
+	public static readonly Point Zero = new Point (0, 0);
+
 	public int x;
 	public int y;
 

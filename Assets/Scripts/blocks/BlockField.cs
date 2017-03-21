@@ -18,8 +18,8 @@ public class BlockField {
 	}
 
 	private void InsertEmptyBlock(int column, int row) {
-		Point position = new Point (column, row);
-		InsertBlock(Block.CreateEmpty (position));
+		Block emptyBlock = Block.CreateEmpty(new Point (column, row));
+		InsertBlock(emptyBlock);
 	}
 
 	public void InsertBlock(Block block) {
@@ -104,7 +104,7 @@ public class BlockField {
 
 	private void LowerBlock(int column, int row) {
 		Block block = YankBlock (column, row);
-		block.Displace (new Point (0, -1));
+		block.Displace (Point.Below);
 		InsertBlock (block);
 	}
 

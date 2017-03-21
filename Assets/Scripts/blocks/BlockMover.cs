@@ -45,15 +45,15 @@ public class BlockMover {
 	}
 
 	public bool MoveDown() {
-		return TryToDisplace(new Point (0, -1));
+		return TryToDisplace(Point.Below);
 	}
 
 	public bool MoveLeft() {
-		return TryToDisplace (new Point (-1, 0));
+		return TryToDisplace (Point.ToTheLeft);
 	}
 
 	public bool MoveRight() {
-		return TryToDisplace (new Point (1, 0));
+		return TryToDisplace (Point.ToTheRight);
 	}
 
 	private bool TryToDisplace(Point displacement) {
