@@ -1,6 +1,6 @@
 ﻿using System;
 
-public delegate void TetrominoMotion();
+public delegate bool TetrominoMotion();
 
 public class InputRepeater {
 	private readonly double initialDelay;

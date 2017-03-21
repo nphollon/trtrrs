@@ -1,45 +1,31 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-
-[Serializable]
-public class TetrominoPrototype {
-	public List<Point> blockPositions;
-	public GameObject spritePrototype;
-	public bool evenWidth;
-
-	public List<Block> CreateBlocksWithOrigin(Point origin) {
-		List<Block> blocks = new List<Block> ();
-
-		foreach (Point relativePosition in blockPositions) {
-			Point absolutePosition = Point.Sum(origin, relativePosition);
-			Block block = Block.CreateFromPrototype(spritePrototype, absolutePosition);
-			blocks.Add(block);
-		}
-
-		return blocks;
-	}
-}
 
 public class Tetromino {
+	private static readonly Tetromino empty = new Tetromino (new List<Block> (), new List<Point> (), new Point (0, 0), new Point (0, 0));
+
 	private List<Block> blocks;
 	private Point origin;
-	public bool evenWidth;
+	private Point pivotOffset;
+	private List<Point> rotatedPositions;
 
 	public static Tetromino CreateFromPrototype(TetrominoPrototype prototype, Point origin) {
 		List<Block> blocks = prototype.CreateBlocksWithOrigin (origin);
-		return new Tetromino (blocks, origin, prototype.evenWidth);
+		List<Point> rotatedPositions = prototype.GetRotatedPositions ();
+		return new Tetromino (blocks, rotatedPositions, origin, prototype.PivotOffset ());
 	}
+
 
 	public static Tetromino CreateEmpty() {
-		return new Tetromino (new List<Block> (), new Point(0,0), true);
+		return empty;
 	}
 
-	private Tetromino(List<Block> blocks, Point origin, bool evenWidth) {
+	private Tetromino(List<Block> blocks, List<Point> rotatedPositions, Point origin, Point pivotOffset) {
 		this.origin = origin;
 		this.blocks = blocks;
-		this.evenWidth = evenWidth;
+		this.pivotOffset = pivotOffset;
+		this.rotatedPositions = rotatedPositions;
 	}
 
 	public void Destroy() {
@@ -49,64 +35,39 @@ public class Tetromino {
 		blocks.Clear ();
 	}
 
-	public bool Spawn(BlockField field, Point spawnPivot) {
-		return Displace (field, Point.Subtract (spawnPivot, origin));
+	public List<Point> GetDisplacedPoints(Point displacement) {
+		List<Point> points = new List<Point> ();
+
+		foreach (Block block in Blocks) {
+			points.Add (displacement.Plus (block.Position));
+		}
+
+		return points;
 	}
 
-	public bool MoveDown(BlockField field) {
-		return Displace (field, new Point (0, -1));
-	}
-
-	public bool MoveLeft(BlockField field) {
-		return Displace (field, new Point (-1, 0));
-	}
-
-	public bool MoveRight(BlockField field) {
-		return Displace (field, new Point (1, 0));
-	}
-
-	public bool RotateAntiClockwise(BlockField field) {
+	public void Displace(Point displacement) {
 		foreach (Block block in blocks) {
-			Point offset = Point.Subtract (block.Position, origin);
-			Point rotatedOffset = Point.RotateAntiClockwise (offset);
-			block.Goal = Point.Sum (origin, rotatedOffset);
-
-			if (evenWidth) {
-				block.Goal = Point.Sum (block.Goal, new Point (0, 1));
-			}
+			block.Position = displacement.Plus (block.Position);
 		}
 
-		return TryToMove (field);
+		origin = Point.Sum (origin, displacement);
 	}
 
-	private bool Displace(BlockField field, Point displacement) {
-		foreach (Block block in blocks) {
-			block.Goal = Point.Sum (block.Position, displacement);
+	public List<Point> GetRotatedPoints() {
+		List<Point> points = new List<Point> ();
+
+		foreach (Point rotatedPosition in rotatedPositions) {
+			points.Add (origin.Plus (rotatedPosition));
 		}
 
-		bool success = TryToMove (field);
-
-		if (success) {
-			origin = Point.Sum (origin, displacement);
-		}
-
-		return success;
+		return points;
 	}
 
-	private bool TryToMove (BlockField field) {
-		bool canMoveBlocks = true;
-
-		foreach (Block block in blocks) {
-			canMoveBlocks = canMoveBlocks && field.IsCellEmpty (block.Goal);
+	public void Rotate() {
+		for (int i = 0; i < blocks.Count; i++) {
+			blocks [i].Position = origin.Plus (rotatedPositions [i]);
+			rotatedPositions [i] = Point.RotateCounterclockwise (rotatedPositions [i]).Plus (pivotOffset);
 		}
-
-		if (canMoveBlocks) {
-			foreach (Block block in blocks) {
-				block.MoveToGoal ();
-			}
-		}
-
-		return canMoveBlocks;
 	}
 		
 	public List<Block> Blocks {

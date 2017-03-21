@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 public class BlockField {
 	private readonly int width;
@@ -21,7 +22,7 @@ public class BlockField {
 		InsertBlock(Block.CreateEmpty (position));
 	}
 
-	private void InsertBlock(Block block) {
+	public void InsertBlock(Block block) {
 		try {
 			field[block.X, block.Y] = block;
 		} catch (IndexOutOfRangeException) {
@@ -34,31 +35,30 @@ public class BlockField {
 	}
 
 	private void DestroyBlock(int column, int row) {
-		RemoveBlock (column, row).Destroy ();
+		YankBlock (column, row).Destroy ();
 	}
 
-	private Block RemoveBlock(int column, int row) {
+	private Block YankBlock(int column, int row) {
 		Block yankedBlock = field [column, row];
 		InsertEmptyBlock (column, row);
 		return yankedBlock;
 	}
 
-	//TODO move out of class!
-	public void AddTetromino(Tetromino tetromino) {
-		foreach (Block block in tetromino.Blocks) {
-			InsertBlock (block);
+	public bool AreCellsEmpty(List<Point> points) {
+		foreach (Point point in points) {
+			if (IsCellOccupied (point.x, point.y)) {
+				return false;
+			}
 		}
+
+		return true;
 	}
 
-	public bool IsCellEmpty(Point point) {
-		return IsCellEmpty (point.x, point.y);
-	}
-		
-	private bool IsCellEmpty(int column, int row) {
+	private bool IsCellOccupied(int column, int row) {
 		try {
-			return !field [column, row].HasSprite();
+			return field [column, row].HasSprite();
 		} catch (IndexOutOfRangeException) {
-			return false;
+			return true;
 		}
 	}
 		
@@ -83,6 +83,10 @@ public class BlockField {
 		return true;
 	}
 
+	private bool IsCellEmpty(int column, int row) {
+		return !IsCellOccupied (column, row);
+	}
+
 	public void RemoveFullRows() {
 		for (int row = 0; row < height; row++) {
 			while (IsRowFull (row)) {
@@ -99,9 +103,8 @@ public class BlockField {
 	}
 
 	private void LowerBlock(int column, int row) {
-		Block block = RemoveBlock (column, row);
-		block.NudgeDown ();
-
+		Block block = YankBlock (column, row);
+		block.Displace (new Point (0, -1));
 		InsertBlock (block);
 	}
 

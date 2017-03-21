@@ -18,12 +18,8 @@ public class Block {
 		this.sprite = sprite;
 	}
 
-	public void NudgeDown() {
-		Position = Position.Below();
-	}
-
-	public void MoveToGoal() {
-		Position = Goal;
+	public void Displace(Point displacement) {
+		Position = Position.Plus(displacement);
 	}
 
 	public void Destroy() {
@@ -43,7 +39,7 @@ public class Block {
 	public Point Position {
 		get { return position; }
 	
-		private set {
+		set {
 			position = value;
 			RepositionSprite ();
 		}
@@ -62,6 +58,4 @@ public class Block {
 	public GameObject Sprite {
 		get { return sprite; }
 	}
-
-	public Point Goal { get; set; }
 }

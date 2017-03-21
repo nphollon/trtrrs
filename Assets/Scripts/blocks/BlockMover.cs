@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 public class BlockMover {
 	private BlockField field;
-	private Point spawnPoint;
 	private Point previewPoint;
+	private Point spawnDisplacement;
 	private List<TetrominoPrototype> tetrominos;
 	private System.Random random;
 	private Tetromino activeTetromino;
@@ -12,8 +12,8 @@ public class BlockMover {
 
 	public BlockMover(BlockField field, Point spawnPoint, Point previewPoint, List<TetrominoPrototype> tetrominos) {
 		this.field = field;
-		this.spawnPoint = spawnPoint;
 		this.previewPoint = previewPoint;
+		this.spawnDisplacement = Point.Subtract (spawnPoint, previewPoint);
 		this.tetrominos = tetrominos;
 		this.random = new System.Random ();
 		activeTetromino = Tetromino.CreateEmpty ();
@@ -28,15 +28,15 @@ public class BlockMover {
 		SpawnTetromino ();
 	}
 
-	public bool SpawnTetromino () {
+	public bool SpawnTetromino() {
 		activeTetromino = nextTetromino;
-		bool success = activeTetromino.Spawn (field, spawnPoint);
+		bool canSpawn = TryToDisplace(spawnDisplacement);
 
-		if (success) {
+		if (canSpawn) {
 			GetNextTetromino ();
 		}
 
-		return success;
+		return canSpawn;
 	}
 
 	private void GetNextTetromino() {
@@ -45,30 +45,53 @@ public class BlockMover {
 	}
 
 	public bool MoveDown() {
-		bool success = activeTetromino.MoveDown (field);
+		return TryToDisplace(new Point (0, -1));
+	}
 
-		if (!success) {
-			field.AddTetromino (activeTetromino);
+	public bool MoveLeft() {
+		return TryToDisplace (new Point (-1, 0));
+	}
+
+	public bool MoveRight() {
+		return TryToDisplace (new Point (1, 0));
+	}
+
+	private bool TryToDisplace(Point displacement) {
+		List<Point> destination = activeTetromino.GetDisplacedPoints(displacement);
+
+		bool canDisplace = field.AreCellsEmpty (destination);
+
+		if (canDisplace) {
+			activeTetromino.Displace (displacement);
 		}
 
-		return success;
+		return canDisplace;
 	}
 
-	public void MoveLeft () {
-		activeTetromino.MoveLeft (field);
-	}
+	public bool RotateAntiClockwise() {
+		List<Point> destination = activeTetromino.GetRotatedPoints ();
 
-	public void MoveRight () {
-		activeTetromino.MoveRight (field);
-	}
+		bool canRotate = field.AreCellsEmpty (destination);
 
-	public void RotateAntiClockwise() {
-		activeTetromino.RotateAntiClockwise (field);
+		if (canRotate) {
+			activeTetromino.Rotate ();
+		}
+
+		return canRotate;
 	}
 
 	public int CountAndRemoveFullRows() {
+		FreezeTetromino ();
 		int fullRows = field.CountFullRows ();
 		field.RemoveFullRows ();
 		return fullRows;
+	}
+
+	private void FreezeTetromino() {
+		foreach (Block block in activeTetromino.Blocks) {
+			field.InsertBlock (block);
+		}
+
+		activeTetromino = Tetromino.CreateEmpty ();
 	}
 }
