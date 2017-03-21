@@ -42,9 +42,15 @@ public class Leaderboard {
 	}
 
 	private void SubmitHighScore() {
-		String initials = initialsInputField.text.ToUpper ();
+		String initials = FormatInitials ();
 		scores.AddScore (initials, score);
 		HideInput ();
+	}
+
+	private string FormatInitials() {
+		int length = initialsInputField.characterLimit;
+		String paddedInitials = initialsInputField.text.PadLeft (length);
+		return paddedInitials.ToUpper ();
 	}
 
 	private void HideInput() {

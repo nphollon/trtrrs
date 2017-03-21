@@ -13,12 +13,7 @@ public class BlockField {
 
 	private void CreateEmptyField() {
 		field = new Block[width,height];
-
-		for (int column = 0; column < width; column++) {
-			for (int row = 0; row < height; row++) {
-				InsertEmptyBlock (column, row);
-			}
-		}
+		map (InsertEmptyBlock);
 	}
 
 	private void InsertEmptyBlock(int column, int row) {
@@ -35,11 +30,7 @@ public class BlockField {
 	}
 
 	public void Destroy() {
-		for (int column = 0; column < width; column++) {
-			for (int row = 0; row < height; row++) {
-				DestroyBlock (column, row);
-			}
-		}
+		map (DestroyBlock);
 	}
 
 	private void DestroyBlock(int column, int row) {
@@ -96,7 +87,7 @@ public class BlockField {
 		for (int row = 0; row < height; row++) {
 			while (IsRowFull (row)) {
 				DestroyRow (row);
-				LowerRowsAbove (row);
+				mapAboveRow (row + 1, LowerBlock);
 			}
 		}
 	}
@@ -107,18 +98,24 @@ public class BlockField {
 		}
 	}
 
-	private void LowerRowsAbove(int bottomRow) {
-		for (int column = 0; column < width; column++) {
-			for (int row = bottomRow + 1; row < height; row++) {
-				LowerBlock (column, row);
-			}
-		}
-	}
-
 	private void LowerBlock(int column, int row) {
 		Block block = RemoveBlock (column, row);
 		block.NudgeDown ();
 
 		InsertBlock (block);
+	}
+
+	private delegate void BlockDelegate(int column, int row);
+
+	private void map(BlockDelegate blockFunction) {
+		mapAboveRow (0, blockFunction);
+	}
+
+	private void mapAboveRow(int bottomRow, BlockDelegate blockFunction) {
+		for (int column = 0; column < width; column++) {
+			for (int row = bottomRow; row < height; row++) {
+				blockFunction (column, row);
+			}
+		}
 	}
 }
