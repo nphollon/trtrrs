@@ -54,7 +54,11 @@ public class HighScoreRepo {
 	}
 
 	public int GetScore(int rank) {
-		return scores [rank - 1].score;
+		try {
+			return scores [rank - 1].score;
+		} catch (ArgumentOutOfRangeException) {
+			return 0;
+		}
 	}
 
 	public void AddScore(String name, int score) {
@@ -85,13 +89,21 @@ public class HighScoreRepo {
 
 	public String FormatHighScores(int count) {
 		StringBuilder builder = new StringBuilder ();
-		List<HighScoreRecord> highScores = scores.GetRange (0, count);
+		List<HighScoreRecord> highScores = GetHighScores (count);
 
 		foreach (HighScoreRecord score in highScores) {
 			builder.AppendLine (FormatScoreRecord(score));
 		}
 
 		return builder.ToString ();
+	}
+
+	private List<HighScoreRecord> GetHighScores(int count) {
+		try {
+			return scores.GetRange(0, count);
+		} catch (ArgumentException) {
+			return scores;
+		}
 	}
 
 	private String FormatScoreRecord(HighScoreRecord score) {
