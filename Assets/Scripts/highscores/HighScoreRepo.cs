@@ -2,8 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
 public class HighScoreRepo {
@@ -23,37 +23,28 @@ public class HighScoreRepo {
 	}
 
 	private void LoadScoresFromFile() {
-		String fileContents = ReadFileContents (filePath);
-		scores = ParseScores (fileContents);
-	}
-
-	private List<HighScoreRecord> ParseScores(String fileContents) {
 		try {
-				
-			String pattern = @"(\d+) ([A-Z]{3})";
-			List<HighScoreRecord> scores = new List<HighScoreRecord> ();
-
-			foreach (Match m in Regex.Matches(fileContents, pattern)) {
-				int score = Int32.Parse (m.Groups [1].Value);
-				String playerName = m.Groups [2].Value;
-				scores.Add (new HighScoreRecord (playerName, score));
+			using (FileStream file = File.Open (filePath, FileMode.OpenOrCreate, FileAccess.Read)) {
+				BinaryFormatter formatter = new BinaryFormatter ();
+				scores = (List<HighScoreRecord>) formatter.Deserialize (file);
 			}
-
-			return scores;
-
-		} catch (FormatException) {
-			return new List<HighScoreRecord> ();
+		} catch (SerializationException) {
+			scores = new List<HighScoreRecord> ();
+		} catch (EndOfStreamException) {
+			scores = new List<HighScoreRecord> ();
 		}
 	}
 
+	private void Sort() {
+		scores.Sort (HighScoreRecord.Compare);
+		scores.Reverse ();
+	}
 
-	private String ReadFileContents(String fileName) {
+	public List<HighScoreRecord> GetHighScores(int count) {
 		try {
-			using (StreamReader inputFile = new StreamReader (fileName)) {
-				return inputFile.ReadToEnd ();
-			}
-		} catch (Exception) {
-			return "";
+			return scores.GetRange(0, count);
+		} catch (ArgumentException) {
+			return scores;
 		}
 	}
 
@@ -70,47 +61,11 @@ public class HighScoreRepo {
 		Sort ();
 		Save ();
 	}
-
-	private void Sort() {
-		scores.Sort (HighScoreRecord.Compare);
-		scores.Reverse ();
-	}
-
+		
 	private void Save() {
-		try {
-			using (StreamWriter outputFile = new StreamWriter (filePath, false)) {
-				WriteScoresToStream(outputFile);
-			}
-		} catch (Exception) {
+		using (FileStream file = File.Open (filePath, FileMode.Create, FileAccess.Write)) {
+			BinaryFormatter formatter = new BinaryFormatter ();
+			formatter.Serialize(file, scores);
 		}
-	}
-
-	private void WriteScoresToStream(TextWriter writer) {
-		foreach(HighScoreRecord score in scores) {
-			writer.WriteLine (FormatScoreRecord(score));
-		}
-	}
-
-	public String FormatHighScores(int count) {
-		StringBuilder builder = new StringBuilder ();
-		List<HighScoreRecord> highScores = GetHighScores (count);
-
-		foreach (HighScoreRecord score in highScores) {
-			builder.AppendLine (FormatScoreRecord(score));
-		}
-
-		return builder.ToString ();
-	}
-
-	private List<HighScoreRecord> GetHighScores(int count) {
-		try {
-			return scores.GetRange(0, count);
-		} catch (ArgumentException) {
-			return scores;
-		}
-	}
-
-	private String FormatScoreRecord(HighScoreRecord score) {
-		return String.Format ("{0} {1}", score.score, score.name);
 	}
 }

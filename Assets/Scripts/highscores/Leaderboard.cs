@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class Leaderboard {
-	private const String highScoresFile = "scores.txt";
+	private const String highScoresFile = "scores.dat";
 	private const int lowestRank = 10;
 
 	private Text display;
@@ -21,7 +23,22 @@ public class Leaderboard {
 	}
 
 	public void Show() {
-		display.text = scores.FormatHighScores (lowestRank);
+		display.text = FormatHighScores (lowestRank);
+	}
+
+	private String FormatHighScores(int count) {
+		StringBuilder builder = new StringBuilder ();
+		List<HighScoreRecord> highScores = scores.GetHighScores (count);
+
+		foreach (HighScoreRecord score in highScores) {
+			builder.AppendLine (FormatScoreRecord(score));
+		}
+
+		return builder.ToString ();
+	}
+
+	private String FormatScoreRecord(HighScoreRecord score) {
+		return String.Format ("{0} {1}", score.score, score.name);
 	}
 
 	public void Hide() {
@@ -42,14 +59,14 @@ public class Leaderboard {
 	}
 
 	private void SubmitHighScore() {
-		String initials = FormatInitials ();
+		String initials = FormatInitialsForSubmission (initialsInputField.text);
 		scores.AddScore (initials, score);
 		HideInput ();
 	}
 
-	private string FormatInitials() {
+	private string FormatInitialsForSubmission(string raw) {
 		int length = initialsInputField.characterLimit;
-		String paddedInitials = initialsInputField.text.PadLeft (length);
+		String paddedInitials = raw.PadLeft (length);
 		return paddedInitials.ToUpper ();
 	}
 

@@ -1,5 +1,6 @@
 ﻿using System;
 
+[Serializable]
 public class HighScoreRecord {
 	public readonly String name;
 	public readonly int score;
