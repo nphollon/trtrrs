@@ -4,21 +4,30 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 public class HighScoreRepo {
 	private List<HighScoreRecord> scores;
-	private String fileName;
+	private String filePath;
 
 	public static HighScoreRepo Load(String fileName) {
-		return new HighScoreRepo (fileName, LoadScoresFromFile (fileName));
+		String filePath = Application.persistentDataPath + "/" + fileName;
+		return new HighScoreRepo (filePath);
 	}
 
-	private static List<HighScoreRecord> LoadScoresFromFile(String fileName) {
-		String fileContents = ReadFileContents (fileName);
-		return ParseScores (fileContents);
+
+	private HighScoreRepo(String filePath) {
+		this.filePath = filePath;
+		LoadScoresFromFile ();
+		Sort ();
 	}
 
-	private static List<HighScoreRecord> ParseScores(String fileContents) {
+	private void LoadScoresFromFile() {
+		String fileContents = ReadFileContents (filePath);
+		scores = ParseScores (fileContents);
+	}
+
+	private List<HighScoreRecord> ParseScores(String fileContents) {
 		try {
 				
 			String pattern = @"(\d+) ([A-Z]{3})";
@@ -37,7 +46,8 @@ public class HighScoreRepo {
 		}
 	}
 
-	private static String ReadFileContents(String fileName) {
+
+	private String ReadFileContents(String fileName) {
 		try {
 			using (StreamReader inputFile = new StreamReader (fileName)) {
 				return inputFile.ReadToEnd ();
@@ -45,12 +55,6 @@ public class HighScoreRepo {
 		} catch (Exception) {
 			return "";
 		}
-	}
-		
-	private HighScoreRepo(String fileName, List<HighScoreRecord> scores) {
-		this.fileName = fileName;
-		this.scores = scores;
-		Sort ();
 	}
 
 	public int GetScore(int rank) {
@@ -74,7 +78,7 @@ public class HighScoreRepo {
 
 	private void Save() {
 		try {
-			using (StreamWriter outputFile = new StreamWriter (fileName, false)) {
+			using (StreamWriter outputFile = new StreamWriter (filePath, false)) {
 				WriteScoresToStream(outputFile);
 			}
 		} catch (Exception) {
