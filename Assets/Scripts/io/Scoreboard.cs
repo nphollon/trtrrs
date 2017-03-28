@@ -8,33 +8,19 @@ public interface Scoreboard {
 	int GetLevel ();
 }
 
-[Serializable]
-public class Reward {
-	public int points;
-	public AudioSource sound;
-
-	public AudioSource Sound {
-		get { return sound; }
-	}
-
-	public int Points {
-		get { return points; }
-	}
-}
-
 public class ScoreboardFactory {
-	private Reward[] scoreRewards;
-	private AudioSource levelUpSound;
+	private int[] scoreMultipliers;
+	private AudioPlayer audio;
 	private Text display;
 
-	public ScoreboardFactory(AudioSource levelUpSound, Reward[] scoreRewards, Text display) {
-		this.scoreRewards = scoreRewards;
-		this.levelUpSound = levelUpSound;
+	public ScoreboardFactory(int[] scoreMultipliers, AudioPlayer audio, Text display) {
+		this.scoreMultipliers = scoreMultipliers;
+		this.audio = audio;
 		this.display = display;
 	}
 
 	public Scoreboard StartAtLevel(int startingLevel) {
-		return new ScoreboardWithAudio (startingLevel, levelUpSound, scoreRewards, display);
+		return new ScoreboardWithAudio (scoreMultipliers, startingLevel, audio, display);
 	}
 }
 
@@ -43,17 +29,17 @@ class ScoreboardWithAudio : Scoreboard {
 	private int level;
 	private int rowsUntilNextLevel;
 
-	private Reward[] scoreRewards;
-	private AudioSource levelUpSound;
+	private int[] scoreMultipliers;
+	private AudioPlayer audio;
 	private Text display;
 
-	public ScoreboardWithAudio(int startingLevel, AudioSource levelUpSound, Reward[] scoreRewards, Text display) {
+	public ScoreboardWithAudio(int[] scoreMultipliers, int startingLevel, AudioPlayer audio, Text display) {
 		score = 0;
 		level = startingLevel;
 		rowsUntilNextLevel = startingLevel * 10 + 10;
 
-		this.scoreRewards = scoreRewards;
-		this.levelUpSound = levelUpSound;
+		this.scoreMultipliers = scoreMultipliers;
+		this.audio = audio;
 		this.display = display;
 
 		RefreshScoreAndLevel();
@@ -66,11 +52,8 @@ class ScoreboardWithAudio : Scoreboard {
 	}
 
 	private void UpdateScore(int rowsCleared) {
-		int rewardIndex = Math.Min (rowsCleared, scoreRewards.Length - 1);
-		Reward reward = scoreRewards [rewardIndex];
-
-		reward.Sound.Play ();
-		score = score + reward.points * level;
+		audio.LandBlock (rowsCleared);
+		score = score + level * scoreMultipliers [rowsCleared];
 	}
 
 	private void UpdateLevel(int rowsCleared) {
@@ -79,7 +62,7 @@ class ScoreboardWithAudio : Scoreboard {
 		if (rowsUntilNextLevel <= 0) {
 			level = level + 1;
 			rowsUntilNextLevel = 10;
-			levelUpSound.Play ();
+			audio.LevelUp ();
 		}
 	}
 

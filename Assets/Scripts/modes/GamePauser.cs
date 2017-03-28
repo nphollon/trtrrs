@@ -5,14 +5,17 @@ using UnityEngine.UI;
 public class GamePauser : Mode {
 	private ModeText modeText;
 	private GameRunner pausedRunner;
+	private AudioPlayer audio;
 
-	public GamePauser(ModeText modeText) {
+	public GamePauser(ModeText modeText, AudioPlayer audio) {
 		this.modeText = modeText;
+		this.audio = audio;
 	}
 
 	public void Pause(GameRunner gameRunner) {
-		pausedRunner = gameRunner;
 		modeText.Print("Game Paused", "Press Enter to Resume");
+		audio.PauseMusic ();
+		pausedRunner = gameRunner;
 	}
 
 	public Mode Update() {
@@ -25,6 +28,7 @@ public class GamePauser : Mode {
 
 	private Mode Resume() {
 		modeText.Clear ();
+		audio.UnPauseMusic ();
 		return pausedRunner;
 	}
 }

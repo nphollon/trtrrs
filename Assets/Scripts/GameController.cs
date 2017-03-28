@@ -9,14 +9,13 @@ public class GameController : MonoBehaviour {
 	public Text modeInstructions;
 	public Text highScoresText;
 	public InputField initialsInputField;
+	public AudioPlayer audioPlayer;
 
 	public Text scoreboardText;
 	public List<TetrominoPrototype> tetrominos;
 	public int[] gravity;
 
-	public Reward[] scoreRewards;
-	public AudioSource levelUpSound;
-	public AudioSource music;
+	public int[] scoreMultipliers;
 
 	public int width;
 	public int height;
@@ -30,12 +29,12 @@ public class GameController : MonoBehaviour {
 		Leaderboard leaderboard = new Leaderboard (highScoresText, initialsInputField);
 		BlockField field = new BlockField(width,height);
 		BlockMover mover = new BlockMover (field, spawnPoint, previewPoint, tetrominos);
-		ScoreboardFactory scoreboardFactory = new ScoreboardFactory (levelUpSound, scoreRewards, scoreboardText);
+		ScoreboardFactory scoreboardFactory = new ScoreboardFactory (scoreMultipliers, audioPlayer, scoreboardText);
 
 		ReadyToPlay readyToPlay = new ReadyToPlay (modeText, leaderboard);
 		LevelSelecter levelSelecter = new LevelSelecter (modeText);
-		GameRunner gameRunner = new GameRunner (mover, scoreboardFactory, music);
-		GamePauser gamePauser = new GamePauser (modeText);
+		GameRunner gameRunner = new GameRunner (mover, scoreboardFactory, audioPlayer);
+		GamePauser gamePauser = new GamePauser (modeText, audioPlayer);
 		GameEnder gameEnder = new GameEnder (modeText, field);
 		GameRestarter gameRestarter = new GameRestarter (modeText, leaderboard);
 
