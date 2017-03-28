@@ -16,6 +16,7 @@ public class GameController : MonoBehaviour {
 
 	public Reward[] scoreRewards;
 	public AudioSource levelUpSound;
+	public AudioSource music;
 
 	public int width;
 	public int height;
@@ -33,7 +34,7 @@ public class GameController : MonoBehaviour {
 
 		ReadyToPlay readyToPlay = new ReadyToPlay (modeText, leaderboard);
 		LevelSelecter levelSelecter = new LevelSelecter (modeText);
-		GameRunner gameRunner = new GameRunner (mover, scoreboardFactory);
+		GameRunner gameRunner = new GameRunner (mover, scoreboardFactory, music);
 		GamePauser gamePauser = new GamePauser (modeText);
 		GameEnder gameEnder = new GameEnder (modeText, field);
 		GameRestarter gameRestarter = new GameRestarter (modeText, leaderboard);

@@ -15,14 +15,16 @@ public class GameRunner : Mode {
 
 	private ScoreboardFactory scoreboardFactory;
 	private Scoreboard scoreboard;
+	private AudioSource music;
 	private BlockMover mover;
 
 	private GamePauser pauser;
 	private GameEnder gameOver;
 
-	public GameRunner(BlockMover mover, ScoreboardFactory scoreboardFactory) {
+	public GameRunner(BlockMover mover, ScoreboardFactory scoreboardFactory, AudioSource music) {
 		this.scoreboardFactory = scoreboardFactory;
 		this.mover = mover;
+		this.music = music;
 
 		leftShifter = new InputRepeater (0.25, 0.02, mover.MoveLeft);
 		rightShifter = new InputRepeater (0.25, 0.02, mover.MoveRight);
@@ -39,6 +41,7 @@ public class GameRunner : Mode {
 
 	public void BeginAtLevel(int startingLevel) {
 		scoreboard = scoreboardFactory.StartAtLevel (startingLevel);
+		music.Play ();
 		mover.Reset ();
 	}
 
@@ -67,6 +70,7 @@ public class GameRunner : Mode {
 				bool couldSpawn = mover.SpawnTetromino ();
 
 				if (!couldSpawn) {
+					music.Stop ();
 					gameOver.End (scoreboard.GetScore());
 					return gameOver;
 				}
