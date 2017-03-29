@@ -5,8 +5,17 @@ public class AudioPlayer : MonoBehaviour {
 	public AudioSource levelUpSound;
 	public AudioSource[] landingSounds;
 
+	public float fadeIn;
+	public float fadeOut;
+
+	private float targetVolume;
+
+	public void Start() {
+		StopMusic ();
+	}
+
 	public void StartMusic() {
-		music.Play ();
+		targetVolume = 1;
 	}
 
 	public void PauseMusic() {
@@ -18,7 +27,7 @@ public class AudioPlayer : MonoBehaviour {
 	}
 
 	public void StopMusic() {
-		music.Stop ();
+		targetVolume = 0;
 	}
 
 	public void LevelUp() {
@@ -27,5 +36,13 @@ public class AudioPlayer : MonoBehaviour {
 
 	public void LandBlock(int rowsCleared) {
 		landingSounds [rowsCleared].Play ();
+	}
+
+	public void Update() {
+		if (music.volume > targetVolume) {
+			music.volume -= Time.deltaTime / fadeOut;
+		} else if (music.volume < targetVolume) {
+			music.volume += Time.deltaTime / fadeIn;
+		}
 	}
 }
