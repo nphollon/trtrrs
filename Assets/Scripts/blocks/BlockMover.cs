@@ -1,27 +1,27 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
-public class BlockMover {
-	private BlockField field;
-	private Point previewPoint;
+public class BlockMover : MonoBehaviour {
+	public BlockField blockField;
+	public Point previewPoint;
+	public Point spawnPoint;
+	public List<TetrominoPrototype> tetrominos;
+
 	private Point spawnDisplacement;
-	private List<TetrominoPrototype> tetrominos;
 	private System.Random random;
 	private Tetromino activeTetromino;
 	private Tetromino nextTetromino;
 
-	public BlockMover(BlockField field, Point spawnPoint, Point previewPoint, List<TetrominoPrototype> tetrominos) {
-		this.field = field;
-		this.previewPoint = previewPoint;
-		this.spawnDisplacement = Point.Subtract (spawnPoint, previewPoint);
-		this.tetrominos = tetrominos;
-		this.random = new System.Random ();
+	public void Start() {
+		spawnDisplacement = Point.Subtract (spawnPoint, previewPoint);
+		random = new System.Random ();
 		activeTetromino = Tetromino.CreateEmpty ();
 		nextTetromino = Tetromino.CreateEmpty ();
 	}
 
 	public void Reset() {
-		field.Destroy ();
+		blockField.Destroy ();
 		activeTetromino.Destroy ();
 		nextTetromino.Destroy ();
 		GetNextTetromino ();
@@ -59,7 +59,7 @@ public class BlockMover {
 	private bool TryToDisplace(Point displacement) {
 		List<Point> destination = activeTetromino.GetDisplacedPoints(displacement);
 
-		bool canDisplace = field.AreCellsEmpty (destination);
+		bool canDisplace = blockField.AreCellsEmpty (destination);
 
 		if (canDisplace) {
 			activeTetromino.Displace (displacement);
@@ -71,7 +71,7 @@ public class BlockMover {
 	public bool RotateAntiClockwise() {
 		List<Point> destination = activeTetromino.GetRotatedPoints ();
 
-		bool canRotate = field.AreCellsEmpty (destination);
+		bool canRotate = blockField.AreCellsEmpty (destination);
 
 		if (canRotate) {
 			activeTetromino.Rotate ();
@@ -82,14 +82,14 @@ public class BlockMover {
 
 	public int CountAndRemoveFullRows() {
 		FreezeTetromino ();
-		int fullRows = field.CountFullRows ();
-		field.RemoveFullRows ();
+		int fullRows = blockField.CountFullRows ();
+		blockField.RemoveFullRows ();
 		return fullRows;
 	}
 
 	private void FreezeTetromino() {
 		foreach (Block block in activeTetromino.Blocks) {
-			field.InsertBlock (block);
+			blockField.InsertBlock (block);
 		}
 
 		activeTetromino = Tetromino.CreateEmpty ();

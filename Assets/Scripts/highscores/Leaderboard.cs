@@ -5,25 +5,22 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class Leaderboard {
-	private const String highScoresFile = "scores.dat";
-	private const int lowestRank = 10;
+public class Leaderboard : MonoBehaviour {
+	public String highScoresFile;
+	public int lowestRank;
+	public Text highScoresList;
+	public InputField initialsInputField;
 
-	private Text display;
-	private InputField initialsInputField;
 	private HighScoreRepo scores;
-	int score;
+	private int score;
 
-	public Leaderboard(Text display, InputField initialsInputField) {
-		this.display = display;
-		this.initialsInputField = initialsInputField;
+	public void Start () {
 		scores = HighScoreRepo.Load (highScoresFile);
-
 		HideInput ();
 	}
 
 	public void Show() {
-		display.text = FormatHighScores (lowestRank);
+		highScoresList.text = FormatHighScores (lowestRank);
 	}
 
 	private String FormatHighScores(int count) {
@@ -42,7 +39,7 @@ public class Leaderboard {
 	}
 
 	public void Hide() {
-		display.text = "";
+		highScoresList.text = "";
 	}
 
 	public void GetInitialsFor(int score) {

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
-public class BlockField {
-	private readonly int width;
-	private readonly int height;
+public class BlockField : MonoBehaviour {
+	public int width;
+	public int height;
 	private Block[,] field;
 
-	public BlockField(int width, int height) {
-		this.width = width;
-		this.height = height;
+	public void Start () {
 		CreateEmptyField ();
 	}
 

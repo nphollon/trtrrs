@@ -1,13 +1,9 @@
-﻿using UnityEngine.UI;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
-public class ModeText {
-	private Text heading;
-	private Text subheading;
-
-	public ModeText(Text heading, Text subheading) {
-		this.heading = heading;
-		this.subheading = subheading;
-	}
+public class ModeText : MonoBehaviour {
+	public Text heading;
+	public Text subheading;
 
 	public void Clear() {
 		Print ("", "");

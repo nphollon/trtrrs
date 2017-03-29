@@ -8,19 +8,13 @@ public interface Scoreboard {
 	int GetLevel ();
 }
 
-public class ScoreboardFactory {
-	private int[] scoreMultipliers;
-	private AudioPlayer audio;
-	private Text display;
-
-	public ScoreboardFactory(int[] scoreMultipliers, AudioPlayer audio, Text display) {
-		this.scoreMultipliers = scoreMultipliers;
-		this.audio = audio;
-		this.display = display;
-	}
+public class ScoreboardFactory : MonoBehaviour {
+	public int[] scoreMultipliers;
+	public AudioPlayer audioPlayer;
+	public Text scoreText;
 
 	public Scoreboard StartAtLevel(int startingLevel) {
-		return new ScoreboardWithAudio (scoreMultipliers, startingLevel, audio, display);
+		return new ScoreboardWithAudio (scoreMultipliers, startingLevel, audioPlayer, scoreText);
 	}
 }
 
@@ -30,16 +24,16 @@ class ScoreboardWithAudio : Scoreboard {
 	private int rowsUntilNextLevel;
 
 	private int[] scoreMultipliers;
-	private AudioPlayer audio;
+	private AudioPlayer audioPlayer;
 	private Text display;
 
-	public ScoreboardWithAudio(int[] scoreMultipliers, int startingLevel, AudioPlayer audio, Text display) {
+	public ScoreboardWithAudio(int[] scoreMultipliers, int startingLevel, AudioPlayer audioPlayer, Text display) {
 		score = 0;
 		level = startingLevel;
 		rowsUntilNextLevel = startingLevel * 10 + 10;
 
 		this.scoreMultipliers = scoreMultipliers;
-		this.audio = audio;
+		this.audioPlayer = audioPlayer;
 		this.display = display;
 
 		RefreshScoreAndLevel();
@@ -52,7 +46,7 @@ class ScoreboardWithAudio : Scoreboard {
 	}
 
 	private void UpdateScore(int rowsCleared) {
-		audio.LandBlock (rowsCleared);
+		audioPlayer.LandBlock (rowsCleared);
 		score = score + level * scoreMultipliers [rowsCleared];
 	}
 
@@ -62,7 +56,7 @@ class ScoreboardWithAudio : Scoreboard {
 		if (rowsUntilNextLevel <= 0) {
 			level = level + 1;
 			rowsUntilNextLevel = 10;
-			audio.LevelUp ();
+			audioPlayer.LevelUp ();
 		}
 	}
 
