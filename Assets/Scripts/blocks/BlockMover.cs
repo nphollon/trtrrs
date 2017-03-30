@@ -13,7 +13,7 @@ public class BlockMover : MonoBehaviour {
 	private Tetromino activeTetromino;
 	private Tetromino nextTetromino;
 
-	public void Start() {
+	public void Awake () {
 		spawnDisplacement = Point.Subtract (spawnPoint, previewPoint);
 		random = new System.Random ();
 		activeTetromino = Tetromino.CreateEmpty ();

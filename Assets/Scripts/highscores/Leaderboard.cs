@@ -14,7 +14,7 @@ public class Leaderboard : MonoBehaviour {
 	private HighScoreRepo scores;
 	private int score;
 
-	public void Start () {
+	public void Awake () {
 		scores = HighScoreRepo.Load (highScoresFile);
 		HideInput ();
 	}

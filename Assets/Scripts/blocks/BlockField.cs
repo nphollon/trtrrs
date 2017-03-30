@@ -7,7 +7,7 @@ public class BlockField : MonoBehaviour {
 	public int height;
 	private Block[,] field;
 
-	public void Start () {
+	public void Awake () {
 		CreateEmptyField ();
 	}
 
