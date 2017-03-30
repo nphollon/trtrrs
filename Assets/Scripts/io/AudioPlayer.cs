@@ -7,6 +7,7 @@ public class AudioPlayer : MonoBehaviour {
 
 	public float fadeIn;
 	public float fadeOut;
+	public float musicVolume;
 
 	private float targetVolume;
 
@@ -15,7 +16,7 @@ public class AudioPlayer : MonoBehaviour {
 	}
 
 	public void StartMusic() {
-		targetVolume = 1;
+		targetVolume = musicVolume;
 	}
 
 	public void PauseMusic() {
